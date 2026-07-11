@@ -10,15 +10,14 @@
 
 // Base class for panel properties
 class PanelProperties {
-    constructor() {
-        this.b_eff = 1000; // effective width in mm
+    constructor(b_eff = 1000) {
+        this.b_eff = b_eff;
     }
 
     calculate(cltLayup) {
         throw new Error("calculate method must be implemented by subclass");
     }
 
-    // helper to get E and G based on orientation
     getLayerModuli(layer) {
         let E = layer.orientation === 'major' ? layer.materialGrade.E : 0;
         let G = layer.orientation === 'major' ? layer.materialGrade.G : layer.materialGrade.G_90;
@@ -38,13 +37,13 @@ class ShearAnalogyMethod extends PanelProperties {
 
         let result = new PanelPropertiesType();
 
-        // Menemukan total ketebalan untuk mencari titik tengah (centroid y_center)
+        // total ketebalan utk cari titik tengah (centroid y_center)
         let totalThickness = 0;
         for (let layer of layers) {
             totalThickness += layer.thickness;
         }
 
-        // Karena harus simetris, neutral axis pasti ada di tengah (y_center = totalThickness / 2)
+        // krn hrs simetris, neutral axis pasti ada di tengah (y_center = totalThickness / 2)
         let y_center = totalThickness / 2;
 
         let topY = totalThickness;
@@ -53,7 +52,6 @@ class ShearAnalogyMethod extends PanelProperties {
             let { E, G } = this.getLayerModuli(layer);
 
             let t = layer.thickness;
-            // Calculate distance to reference axis based on Excel standard
             let a = 192.5 - (i * 35);
 
             let A = this.b_eff * t;

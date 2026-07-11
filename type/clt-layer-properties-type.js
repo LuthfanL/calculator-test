@@ -7,6 +7,6 @@ class CLTLayerPropertiesType {
         this.a = a;
         this.E_I = E_I;
         this.E_A_a2 = E_A_a2;
-        this.gamma = 1.0; // Specific to Gamma method, default to 1.0
+        this.gamma = 1.0; 
     }
 }

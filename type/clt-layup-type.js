@@ -5,7 +5,7 @@ class CLTLayupType {
          * @type {CLTLayerType[]}
          */
         this.layers = [];
-        this.length = length; // Reference length in mm
+        this.length = length; 
     }
     
     addLayer(layer) {
