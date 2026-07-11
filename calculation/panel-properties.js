@@ -103,7 +103,20 @@ class GammaMethod extends PanelProperties {
             let I = this.b_eff * Math.pow(t, 3) / 12;
 
             let gamma = 1.0;
-            // Set Gamma to 1.0 based on Excel template
+            if (E > 0) {
+                let middle_index = Math.floor(layers.length / 2);
+                // Hanya hitung gamma untuk layer major yang BUKAN layer tengah
+                if (i !== middle_index) {
+                    let adjacent_minor_index = (i < middle_index) ? i + 1 : i - 1;
+                    let cross_layer = layers[adjacent_minor_index];
+                    let d_i = cross_layer.thickness;
+                    let G_R = cross_layer.materialGrade.G_90; // Rolling shear modulus
+                    
+                    let fraction1 = (Math.pow(Math.PI, 2) * E * A) / Math.pow(L, 2);
+                    let fraction2 = d_i / (G_R * this.b_eff);
+                    gamma = 1 / (1 + (fraction1 * fraction2));
+                }
+            }
 
             let E_I = E * I;
             let E_A_a2 = gamma * E * A * Math.pow(a, 2);
