@@ -27,9 +27,6 @@ const finalEi = document.getElementById('final-ei');
 
 // Init
 function init() {
-    renderLayerInputs();
-
-    layerCountInput.addEventListener('change', renderLayerInputs);
     methodSelect.addEventListener('change', () => {
         let method = methodSelect.value;
         if (method === 'shear') {
@@ -40,7 +37,6 @@ function init() {
             layerHelp.innerText = "Hanya 3 atau 5 layer.";
             if (layerCountInput.value !== '3' && layerCountInput.value !== '5') {
                 layerCountInput.value = 5;
-                renderLayerInputs();
             }
         }
     });
@@ -48,39 +44,6 @@ function init() {
     btnCalculate.addEventListener('click', calculateProperties);
 }
 
-// Render dynamic inputs based on total layers
-function renderLayerInputs() {
-    let count = parseInt(layerCountInput.value);
-    if (isNaN(count) || count < 1) count = 5;
-
-    layerContainer.innerHTML = '';
-
-    for (let i = 1; i <= count; i++) {
-        let orientation = (i % 2 === 0) ? 'minor' : 'major';
-        let html = `
-        <div class="border rounded p-2 mb-2 bg-white">
-            <label class="fw-bold fs-6 mb-1">Layer ${i}</label>
-            <div class="row g-2">
-                <div class="col-4">
-                    <input type="number" class="form-control form-control-sm layer-thick" placeholder="Thick" value="35">
-                </div>
-                <div class="col-4">
-                    <select class="form-select form-select-sm layer-orient">
-                        <option value="major" ${orientation === 'major' ? 'selected' : ''}>Major (0°)</option>
-                        <option value="minor" ${orientation === 'minor' ? 'selected' : ''}>Minor (90°)</option>
-                    </select>
-                </div>
-                <div class="col-4">
-                    <select class="form-select form-select-sm layer-grade">
-                        <option value="MGP10">MGP10</option>
-                        <option value="MGP12">MGP12</option>
-                    </select>
-                </div>
-            </div>
-        </div>`;
-        layerContainer.insertAdjacentHTML('beforeend', html);
-    }
-}
 
 // Retrieve data n Calculate
 function calculateProperties() {
@@ -94,16 +57,13 @@ function calculateProperties() {
 
         let layup = new CLTLayupType(lengthM * 1000);
 
-        let thickInputs = document.querySelectorAll('.layer-thick');
-        let orientInputs = document.querySelectorAll('.layer-orient');
-        let gradeInputs = document.querySelectorAll('.layer-grade');
+        let globalThick = parseFloat(document.getElementById('global-thick').value) || 35;
+        let globalGrade = document.getElementById('global-grade').value || 'MGP10';
 
-        for (let i = 0; i < count; i++) {
-            let t = parseFloat(thickInputs[i].value);
-            let orient = orientInputs[i].value;
-            let gradeName = gradeInputs[i].value;
-
-            let layer = new CLTLayerType(t, orient, materials[gradeName]);
+        for (let i = 1; i <= count; i++) {
+            // Layer 1 (i=1) is major, Layer 2 (i=2) is minor, Layer 3 (i=3) is major...
+            let orient = (i % 2 === 0) ? 'minor' : 'major';
+            let layer = new CLTLayerType(globalThick, orient, materials[globalGrade]);
             layup.addLayer(layer);
         }
 
